@@ -5,7 +5,7 @@
 > [!Important]
 > Introduzca a continuación su nombre y apellidos:
 >
-> Fulano Mengano Zutano
+> Javier González Montesinos
 
 ## Aviso Importante
 
@@ -96,11 +96,86 @@ Inserte a continuación una captura de pantalla que muestre el resultado de ejec
 fichero `algebra/vectores.py` con la opción *verbosa*, de manera que se muestre el
 resultado de la ejecución de los tests unitarios.
 
+![Ejecución verbosa de los tests unitarios](tests-vectores.png)
+
 #### Código desarrollado
 
 Inserte a continuación el código de los métodos desarrollados en esta tarea, usando los
 comandos necesarios para que se realice el realce sintáctico en Python del mismo (no
 vale insertar una imagen o una captura de pantalla, debe hacerse en formato *markdown*).
+
+```python
+def __mul__(self, other):
+    """
+    Multiplica el vector por un escalar o calcula el producto de Hadamard.
+
+    Argumentos:
+        other: Escalar o segundo vector.
+
+    Salida:
+        Un nuevo Vector con el resultado.
+    """
+    if isinstance(other, Number):
+        return Vector(componente * other
+                      for componente in self.componentes)
+    if isinstance(other, Vector):
+        self._comprobar_dimension(other)
+        return Vector(a * b for a, b in zip(self.componentes,
+                                            other.componentes))
+    return NotImplemented
+
+def __rmul__(self, other):
+    """Multiplica el vector por un escalar situado a su izquierda."""
+    return self * other
+
+def __matmul__(self, other):
+    """
+    Calcula el producto escalar de dos vectores.
+
+    Argumentos:
+        other: Segundo Vector del producto.
+
+    Salida:
+        La suma de los productos de las componentes correspondientes.
+    """
+    if not isinstance(other, Vector):
+        return NotImplemented
+    self._comprobar_dimension(other)
+    return sum(a * b for a, b in zip(self.componentes,
+                                     other.componentes))
+
+def __floordiv__(self, other):
+    """
+    Obtiene la componente de este vector paralela a otro.
+
+    Argumentos:
+        other: Vector que establece la dirección de la proyección.
+
+    Salida:
+        La componente paralela como un nuevo Vector.
+    """
+    if not isinstance(other, Vector):
+        return NotImplemented
+    self._comprobar_dimension(other)
+    norma_cuadrado = other @ other
+    if norma_cuadrado == 0:
+        raise ValueError("no se puede proyectar sobre el vector nulo")
+    return ((self @ other) / norma_cuadrado) * other
+
+def __mod__(self, other):
+    """
+    Obtiene la componente de este vector perpendicular a otro.
+
+    Argumentos:
+        other: Vector que establece la dirección de referencia.
+
+    Salida:
+        La componente perpendicular como un nuevo Vector.
+    """
+    if not isinstance(other, Vector):
+        return NotImplemented
+    return self - self // other
+```
 
 #### Subida del resultado al repositorio GitHub y *pull-request*
 
